@@ -9,6 +9,7 @@ def show_all():
             print(line)
     main_menu()
 
+
 def import_new_data():
     print("Ввод новых данных.")
     new_line = ""
@@ -23,6 +24,7 @@ def import_new_data():
         saved_info.writelines(new_line[:-1])
         saved_info.write("\n")
 
+
 def lf_everywhere():
     lf_str = input("Введите запрос: ")
     with open("save.txt", "r", encoding="UTF-8") as saved_info:
@@ -32,6 +34,9 @@ def lf_everywhere():
             if str(lf_str).lower() in str(line[1]).lower():
                 print(line[1])
                 found_result_action(line[0])
+    print("Нет совпадений")
+
+
 def find_menu():
     print("Введите параметры поиска.")
     print("Искать везде (a), поиск по категории: ", end="")
@@ -64,24 +69,27 @@ def main_menu():
         else:
             print("Ошибка ввода команды.")
 
+
 def edit_menu(edit_line_num):
-    print("Выберите параметры редактирования: (a) - всё,", end= " " )
+    print("Выберите параметры редактирования: (a) - всё,", end=" ")
     edit_options = data_format()
     for i in range(len(edit_options)):
         print(edit_options[i], " (", i, ") ", sep="", end=" ")
     edit_what = input().lower()
     with open("save.txt", "r", encoding="UTF-8") as saved_info:
         data_save = saved_info.readlines()
-    changed_line = data_save[edit_line_num].split()
+    changed_line = ["" for i in range(len(edit_options))]
     for i in range(len(edit_options)):
         if edit_what in ["а", "a"] or int(edit_what) == i:
             print("Введите новое значение ", edit_options[i], ":", sep="")
             changed_line[i] = input().replace(" ", "_")
             if changed_line[i] == "" or changed_line[i] == None:
                 changed_line[i] = "<None>"
-    data_save[edit_line_num] = " ".join(changed_line)
+    data_save[edit_line_num] = " ".join(changed_line) + "\n"
     with open("save.txt", "w", encoding="UTF-8") as saved_info:
         saved_info.writelines(data_save)
+    main_menu()
+
 
 def lf_with_parameter(lf_index):
     lf_string = input("Введите искомое:")
@@ -100,9 +108,10 @@ def lf_with_parameter(lf_index):
             else:
                 main_menu()
 
+
 def found_result_action(line_number):
     while True:
-        ask = input("Продолжить поиск(k), редактировать строку(e) или выйти в меню(q)?").lower()
+        ask = input("Продолжить поиск(k), редактировать строку(e), удалить строку(d) или выйти в меню(q)?").lower()
         if ask == "k":
             break
         elif ask == "e":
@@ -110,7 +119,19 @@ def found_result_action(line_number):
             edit_menu(line_number)
         elif ask == "q":
             main_menu()
+        elif ask == "d":
+            delete_line(line_number)
         print("Ошибка ввода продолжения работы с результатами поиска")
+
+
+def delete_line(id_to_remove):
+    with open("save.txt", "r", encoding="UTF-8") as saved_info:
+        data_save = saved_info.readlines()
+    del data_save[id_to_remove]
+    with open("save.txt", "w", encoding="UTF-8") as saved_info:
+        saved_info.writelines(data_save)
+    print("Данные удалены.")
+    main_menu()
 
 
 main_menu()
