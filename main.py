@@ -26,14 +26,12 @@ def import_new_data():
 def lf_everywhere():
     lf_str = input("Введите запрос: ")
     with open("save.txt", "r", encoding="UTF-8") as saved_info:
-        looking_at_line_num = -1
-        for line in saved_info:
-            looking_at_line_num += 1
-            if looking_at_line_num == 0:
+        for line in enumerate(saved_info):
+            if line[0] == 0:
                 continue
-            if str(lf_str).lower() in str(line).lower():
-                print(line)
-                found_result_action(looking_at_line_num)
+            if str(lf_str).lower() in str(line[1]).lower():
+                print(line[1])
+                found_result_action(line[0])
 def find_menu():
     print("Введите параметры поиска.")
     print("Искать везде (a), поиск по категории: ", end="")
@@ -57,7 +55,7 @@ def main_menu():
     while True:
         print("Меню. Работа с данными: вывести все (v), добавить (a), найти и изменить (f), выйти (q).", end=" ")
         main_menu_ask = input().lower()
-        if main_menu_ask == "f" or main_menu_ask == "а":
+        if main_menu_ask == "f":
             find_menu()
         elif main_menu_ask == "q":
             quit()
@@ -67,12 +65,23 @@ def main_menu():
             print("Ошибка ввода команды.")
 
 def edit_menu(edit_line_num):
-    print("смотрим на строку:", edit_line_num)
+    print("Выберите параметры редактирования: (a) - всё,", end= " " )
+    edit_options = data_format()
+    for i in range(len(edit_options)):
+        print(edit_options[i], " (", i, ") ", sep="", end=" ")
+    edit_what = input().lower()
     with open("save.txt", "r", encoding="UTF-8") as saved_info:
-        for line in enumerate(saved_info):
-            if line[0] == edit_line_num:
-                print(line[1])
-    exit()
+        data_save = saved_info.readlines()
+    changed_line = data_save[edit_line_num].split()
+    for i in range(len(edit_options)):
+        if edit_what in ["а", "a"] or int(edit_what) == i:
+            print("Введите новое значение ", edit_options[i], ":", sep="")
+            changed_line[i] = input().replace(" ", "_")
+            if changed_line[i] == "" or changed_line[i] == None:
+                changed_line[i] = "<None>"
+    data_save[edit_line_num] = " ".join(changed_line)
+    with open("save.txt", "w", encoding="UTF-8") as saved_info:
+        saved_info.writelines(data_save)
 
 def lf_with_parameter(lf_index):
     lf_string = input("Введите искомое:")
